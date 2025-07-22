@@ -1,13 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { toggleMenu } from "../utils/appSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { YOUTUBE_SEARCH_API } from "../utils/constants";
+import { cacheResults } from "../utils/searchSlice";
 
 const Head = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchCache = useSelector(store => store.search);
   const dispatch = useDispatch();
   const toggleMenuHandler = () => {
     dispatch(toggleMenu());
   };
+  const getSuggestions = async () => {
+    const data = await fetch(YOUTUBE_SEARCH_API + searchQuery);
+    const json = await data.json();
+    setSuggestions(json[1]);
+    // cache the data
+    dispatch(cacheResults({
+      [searchQuery]: json[1],
+    }));
+  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if(searchCache[searchQuery]) {
+        setSuggestions(searchCache[searchQuery])
+      }else {
+        getSuggestions();
+      }
+    }, 200);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
+
   return (
     <div className="flex justify-between p-5 shadow-lg">
       <div className="flex w-1/4 mx-2">
@@ -25,14 +53,35 @@ const Head = () => {
           />
         </Link>
       </div>
-      <div className="w-2/4 flex">
-        <input
-          className="w-3/4 border border-gray-400 rounded-l-full p-2"
-          type="text"
-        />
-        <button className="border border-gray-400 rounded-r-full py-2 px-4 bg-gray-200">
-          🔍
-        </button>
+
+      <div className="flex flex-col w-2/4 relative">
+        <div className="w-full flex">
+          <input
+            className="w-3/4 border border-gray-400 rounded-l-full p-2"
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setShowSuggestions(false)}
+          />
+          <button
+            className="border border-gray-400 rounded-r-full py-2 px-4 bg-gray-200"
+            onClick={getSuggestions}
+          >
+            🔍
+          </button>
+        </div>
+        {showSuggestions && suggestions.length > 0 &&  (
+          <div className="bg-white p-2 w-3/4 shadow-lg rounded-lg border border-gray-200 absolute top-full">
+            <ul>
+              {suggestions.map((suggestion, idx) => (
+                <li key={idx} className="py-2 px-3 shadow-sm hover:bg-gray-200">
+                  🔍 {suggestion}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="w-1/4 flex items-center justify-end px-14">
         <img
