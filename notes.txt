@@ -1,0 +1,86 @@
+- Machine Coding Tips
+    - Requirement Clasrification
+        - Features
+        - Tech Stack and justification for each (5 mins, HLD)
+            - Redux / Context API
+            - Tailwind
+            - React-Router-DOm
+            - Bundler
+            - Jest, React-testing Library
+        - Design (5 min) (screenshot in laptop, write in copy while making notes)
+
+Youtube-Clone: 
+    - npx create-react-app namaste-youtube (create-react-app is a JS library, we are executing it once)
+    - I used vite
+    - How npm run works:
+        NPM reads package.json → finds script
+        Looks for the CLI (like vite) in node_modules/.bin
+        Runs it in a shell (no global install needed)
+    - setup tailwind
+    - Do not focus much on desiging and css, instead focus on the functionalities
+    - setup Redux
+    - Implement toggle sidebar feature
+    - Create the button list
+    - get the videos (hardcoded or API as discussed with the interviewer)
+    - when useState is called, it initiates the reconciliation process
+    - Make it work for one, then scale it(mostly while applying map)
+    - Make routes 
+    - Make features of heding/shwoing the sidebar 
+    - URLSearchParams: read about it.
+    - const [searchParams] = useSearchParams();
+    - console.log(searchParams.get("v"));
+    - query and find the video, then play: tried, but the video was not coming, only video data
+    - iframe stands for Inline Frame.
+        It’s an HTML element that allows you to embed another webpage inside your current webpage.
+            <iframe src="https://www.example.com"></iframe>
+            Load the webpage https://www.example.com inside this small frame, like a window on your page.
+
+        ✅ Why YouTube uses iframe?
+            YouTube hosts the video player on its own domain.
+            Instead of giving you the full video player code, it gives you an iframe link.
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID"></iframe>
+            Your browser loads YouTube’s video player inside your page.
+    - HOC : it takes one component and returns a new modified component
+    - Design a search component:
+    - How we start seeing the suggestions on typing some keys? -> API calls for subsequest keypresses
+    - Debouncing: 
+
+        - Debouncing with 200ms : If the difference between 2 key strokes is <200ms => Decline the API call.
+        - > 200ms => make an API call, user might need suggestions
+        - It gives good User-Experience
+    - After every keystokre the API is called
+    - In Debouncing, we make API call after a given time(200ms), ad if in between that any key is pressed before 200ms, reconciliation starts and the return block of useEffect is called and we clear the previous timer. And hance the previous API call is skipped.
+    - Caching
+        Yes, your cacheResults reducer logic is wrong.
+        The issue is with this line:
+            state = { ...state, ...action.payload };
+                This does not update the Redux state because in Redux Toolkit (RTK), you must mutate state directly (Immer handles immutability internally), or you must explicitly return a new state object.
+
+        Correct way:
+            cacheResults: (state, action) => {
+                return { ...state, ...action.payload };
+                }
+        OR (mutate directly – preferred in RTK):
+            cacheResults: (state, action) => {
+            Object.assign(state, action.payload);
+            }
+        Why [searchQuery]?
+            { [searchQuery]: value } means: Use the value of the variable searchQuery as the key, not the string "searchQuery".
+    - Search bar with caching and suggestions with Debouncing
+    - comments with n-level nesting using map and recursion
+    - live chat >>>> infinite scroll >>>> pagination
+    - Challenges: 
+        - Data Layer : Get data live
+        - UI Layer : Update the UI and better UX
+    - Wes Sockets (Trading apps, whatapp)
+    - API Polling (Gmail, Cricbuzz)
+    - chat feature using API pollling
+    - difference between export, export default, export const?
+    - implement search to filter out results.
+
+    - Demo1 and Demo2 components are for these.
+    - useMemo, useCallback, useRef
+    - difference between state, let and ref variables
+        - when the state variable changes, it performs reconciliation, re-renders the component and the update value is shown 
+        - But when we change the let value, it changes for that render(functional context of that component), but when the state changes that chnage is gone as a new functional contextis created for new render and we see again te original value.
+        - The use ref variable changes its value but it does not re-renders the component, and when the component re-renders it persists the changed value and currentvalue is rendered even though a new functional context is created.

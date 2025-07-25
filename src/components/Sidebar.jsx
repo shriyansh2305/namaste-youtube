@@ -19,6 +19,7 @@ const Sidebar = () => {
           <li>Sports</li>
           <li>Gaming</li>
           <li>Movies</li>
+          <li><Link to="/demo">Demo</Link></li>
         </ul>
       </div>
     )
